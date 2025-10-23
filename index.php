@@ -1,3 +1,26 @@
+<?php
+ini_set("allow_url_fopen", 1);
+$json = file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=1985&language=fi');
+$obj = json_decode($json, true);
+
+function flatten($array, $prefix = '') {
+    $result = [];
+
+    foreach ($array as $key => $value) {
+        $newKey = $prefix === '' ? $key : $prefix . '.' . $key;
+
+        if (is_array($value)) {
+            $result = array_merge($result, flatten($value, $newKey));
+        } else {
+            $result[$newKey] = $value;
+        }
+    }
+
+    return $result;
+}
+$flat = flatten($obj['MenusForDays']);
+?>
+
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="en">
 
@@ -28,14 +51,15 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 d-sm-flex justify-content-sm-center">
                 <div class="col mb-4">
                     <div class="d-flex flex-column align-items-center align-items-sm-start">
-                        <h4 class="fw-bold align-self-center">placeholder</h4>
+                        <h4 class="fw-bold align-self-center">
+                            <?php
+                                echo($obj['RestaurantName']);
+                            ?>
+                        </h4>
                         <p class="bg-dark border rounded border-dark p-4">
                         <?php
-                        ini_set("allow_url_fopen", 1);
-                        $json = file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=1985&language=fi');
-                        $obj = json_decode($json, true);
-
-                        print_r($obj);
+                        foreach(array_values($flat) as $values)
+                            echo $values . "<br>";
                         ?>
                         </p>
                     </div>
@@ -76,7 +100,6 @@
         </div>
     </nav>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/script.min.js"></script>
 </body>
 
 </html>
