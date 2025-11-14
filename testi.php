@@ -1,12 +1,14 @@
 <?php
 ini_set("allow_url_fopen", 1);
-$json = file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=198501&language=fi');
-$obj = json_decode($json, true);
+$kisalli = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=1900&language=fi'), true);
+$linus = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=2000&language=fi'), true);
+$delica = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=1985&language=fi'), true);
 
-//litistetään toi kirottu nested array helpommaksi käsitellä
+$obj = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=198501&language=fi'), true);
+
+//litistetään toi kirottu nested array helpommaksi käsitellä, ja poistetaan turhat key-value parit
 function flatten($array, $prefix = '') {
     $result = [];
-
     foreach ($array as $key => $value) {
         $newKey = $prefix === '' ? $key : $prefix . '.' . $key;
 
@@ -16,19 +18,24 @@ function flatten($array, $prefix = '') {
             $result[$newKey] = $value;
         }
     }
+    //poistetaan turhat key-value parit
+    foreach ($result as $key => $value) {
+        if (preg_match("/SortOrder|date/i", $key) == true) {
+            unset($result[$key]);
+        }
+        if (str_starts_with($key, '1.')) {
+            unset($result[$key]);
+        }
+    }
 
     return $result;
 }
-$flat = flatten($obj['MenusForDays']);
+$menu_kisalli = flatten($kisalli['MenusForDays']);
+$menu_linus = flatten($linus['MenusForDays']);
+$menu_delica = flatten($delica['MenusForDays']);
 
-//poistetaan turhat key-value parit
-foreach ($flat as $key => $value) {
-    if (preg_match("/SortOrder|date/i", $key) == true) {
-        unset($flat[$key]);
-    }
-    if (str_starts_with($key, '1.')) {
-        unset($flat[$key]);
-    }
-}
-print_r($flat);
+print_r($menu_kisalli);
+print_r($menu_linus);
+print_r($menu_delica);
+
 ?>
