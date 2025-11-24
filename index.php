@@ -4,8 +4,6 @@ $kisalli = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json
 $linus = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=2000&language=fi'), true);
 $delica = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=1985&language=fi'), true);
 
-$obj = json_decode(file_get_contents('https://www.unica.fi/menuapi/feed/json?costNumber=198501&language=fi'), true);
-
 //litistetään toi kirottu nested array helpommaksi käsitellä, ja poistetaan turhat key-value parit
 function flatten($array, $prefix = '') {
     $result = [];
